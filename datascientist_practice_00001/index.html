@@ -1,22 +1,94 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://fa7ria.GitHub.io</id>
-    <title>Fa7riaBlog</title>
-    <updated>2021-05-08T11:33:26.710Z</updated>
-    <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://fa7ria.GitHub.io"/>
-    <link rel="self" href="https://fa7ria.GitHub.io/atom.xml"/>
-    <subtitle>为学日益，为道日损。损之又损，以至于无为，无为而无不为</subtitle>
-    <logo>https://fa7ria.GitHub.io/images/avatar.png</logo>
-    <icon>https://fa7ria.GitHub.io/favicon.ico</icon>
-    <rights>All rights reserved 2021, Fa7riaBlog</rights>
-    <entry>
-        <title type="html"><![CDATA[DataScientist_Practice_00001]]></title>
-        <id>https://fa7ria.GitHub.io/datascientist_practice_00001/</id>
-        <link href="https://fa7ria.GitHub.io/datascientist_practice_00001/">
-        </link>
-        <updated>2021-05-08T01:31:11.000Z</updated>
-        <content type="html"><![CDATA[<blockquote>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>DataScientist_Practice_00001 | Fa7riaBlog</title>
+<meta name="description" content="为学日益，为道日损。损之又损，以至于无为，无为而无不为">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://fa7ria.GitHub.io/favicon.ico?v=1620473589437">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://fa7ria.GitHub.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://fa7ria.GitHub.io">Fa7riaBlog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>DataScientist_Practice_00001</h1>
+            <p class="article-meta">
+              2021-05-08
+              
+            </p>
+            
+            <div class="post-content">
+              <blockquote>
 <p>Task：对数据集进行拆分，创建一个tf.data.Dataset来加载并进行预处理，然后创建和训练一个包含Embedding层的二进制分类模型</p>
 </blockquote>
 <p>1.下载大型电影评论数据集；</p>
@@ -195,54 +267,115 @@ def preprocess(X_batch, n_words=50):
 X_example = tf.constant([&quot;It's a great, great movie! I loved it.&quot;, &quot;It was terrible, run away!!!&quot;])
 preprocess(X_example)
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[DataScientist_Kownledge_999]]></title>
-        <id>https://fa7ria.GitHub.io/datascientist_-xue-_001/</id>
-        <link href="https://fa7ria.GitHub.io/datascientist_-xue-_001/">
-        </link>
-        <updated>2021-05-07T08:33:11.000Z</updated>
-        <content type="html"><![CDATA[<p>#Adaboost、GBDT、XGBoost的区别是什么？</p>
-<p>Gradient Boosting 和其它 Boosting 算法一样，通过将表现一般的数个模型（通常是深度固定的决策树）组合在一起来集成一个表现较好的模型。抽象地说，模型的训练过程是对一任意可导目标函数的优化过程。通过反复地选择一个指向负梯度方向的函数，该算法可被看做在函数空间里对目标函数进行优化。因此可以说 Gradient Boosting = Gradient Descent + Boosting。</p>
-<p>和 AdaBoost 一样，Gradient Boosting 也是重复选择一个表现一般的模型并且每次基于先前模型的表现进行调整。不同的是，AdaBoost 是通过提升错分数据点的权重来定位模型的不足而 Gradient Boosting 是通过算梯度（gradient）来定位模型的不足。因此相比 AdaBoost, Gradient Boosting 可以使用更多种类的目标函数。</p>
-<p><strong>Adaboost VS GBDT最主要的区别在于两者如何识别模型的问题</strong>。AdaBoost用错分数据点来识别问题，通过调整错分数据点的权重来改进模型。Gradient Boosting通过负梯度来识别问题，通过计算负梯度来改进模型。</p>
-<p>#GBDT 与 XGBoost 区别<br>
-传统GBDT以CART作为基分类器，xgboost还支持线性分类器，这个时候xgboost相当于带L1和L2正则化项的逻辑斯蒂回归（分类问题）或者线性回归（回归问题）。<br>
-传统GBDT在优化时只用到一阶导数信息，xgboost则对代价函数进行了二阶泰勒展开，同时用到了一阶和二阶导数。</p>
-<p>xgboost在代价函数里加入了正则项，用于控制模型的复杂度。正则项里包含了树的叶子节点个数、每个叶子节点上输出的score的L2模的平方和。从Bias-variance tradeoff角度来讲，正则项降低了模型的variance，使学习出来的模型更加简单，防止过拟合，这也是xgboost优于传统GBDT的一个特性。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Hello Gridea]]></title>
-        <id>https://fa7ria.GitHub.io/hello-gridea/</id>
-        <link href="https://fa7ria.GitHub.io/hello-gridea/">
-        </link>
-        <updated>2018-12-11T16:00:00.000Z</updated>
-        <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-<!-- more -->
-<p><a href="https://github.com/getgridea/gridea">Github</a><br>
-<a href="https://gridea.dev/">Gridea 主页</a><br>
-<a href="http://fehey.com/">示例网站</a></p>
-<h2 id="特性">特性👇</h2>
-<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
-<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
-<p>🏷️  你可以对文章进行标签分组</p>
-<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
-<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
-<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
-<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
-<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
-<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
-<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
-<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
-<p>未来，它一定会成为你离不开的伙伴</p>
-<p>尽情发挥你的才华吧！</p>
-<p>😘 Enjoy~</p>
-]]></content>
-    </entry>
-</feed>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://fa7ria.GitHub.io/datascientist_-xue-_001/">
+                <h3 class="post-title">
+                  DataScientist_Kownledge_999
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://fa7ria.GitHub.io/images/avatar.png?v=1620473589437" class="no-responsive avatar">
+    <div class="text-muted">为学日益，为道日损。损之又损，以至于无为，无为而无不为</div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00001/">DataScientist_Practice_00001</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_-xue-_001/">DataScientist_Kownledge_999</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/about/">关于</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/hello-gridea/">Hello Gridea</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge secondary">
+          DataScientist_Knowledge
+        </a>
+      
+        <a href="https://fa7ria.GitHub.io/6J4KjEj3k/" class="badge warning">
+          Gridea
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fa7ria.GitHub.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>
