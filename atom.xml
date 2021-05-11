@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fa7ria.GitHub.io</id>
     <title>Fa7riaBlog</title>
-    <updated>2021-05-09T12:12:50.883Z</updated>
+    <updated>2021-05-11T12:59:45.878Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fa7ria.GitHub.io"/>
     <link rel="self" href="https://fa7ria.GitHub.io/atom.xml"/>
@@ -10,6 +10,56 @@
     <logo>https://fa7ria.GitHub.io/images/avatar.png</logo>
     <icon>https://fa7ria.GitHub.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Fa7riaBlog</rights>
+    <entry>
+        <title type="html"><![CDATA[DSP_00003_TFRecords]]></title>
+        <id>https://fa7ria.GitHub.io/dsp_00003_tfrecords/</id>
+        <link href="https://fa7ria.GitHub.io/dsp_00003_tfrecords/">
+        </link>
+        <updated>2021-05-11T12:57:03.000Z</updated>
+        <content type="html"><![CDATA[<p>import tensorflow_datasets as tfds</p>
+<p>datasets = tfds.load(name=&quot;mnist&quot;)<br>
+mnist_train, mnist_test = datasets[&quot;train&quot;], datasets[&quot;test&quot;]<br>
+print(tfds.list_builders())</p>
+<h1 id="加载fashion-mnist数据集将其拆分为训练集-验证集-测试集">加载Fashion MNIST数据集；将其拆分为训练集、验证集、测试集；</h1>
+<p>(X_train_full, y_train_full), (X_test, y_test) = keras.datasets.fashion_mnist.load_data()<br>
+X_valid, X_train = X_train_full[:5000], X_train_full[5000:]<br>
+y_valid, y_train = y_train_full[:5000], y_train_full[5000:]</p>
+<p>keras.backend.clear_session()<br>
+np.random.seed(7)<br>
+tf.random.set_seed(77)</p>
+<h1 id="shuffle打乱测试集-训练集-验证集的顺序">shuffle打乱测试集、训练集、验证集的顺序</h1>
+<p>train_set = tf.data.Dataset.from_tensor_slices((X_train, y_train)).shuffle(len(X_train))<br>
+valid_set = tf.data.Dataset.from_tensor_slices((X_valid, y_valid))<br>
+test_set = tf.data.Dataset.from_tensor_slices((X_test, y_test))</p>
+<p>def create_example(image, label):<br>
+image_data = tf.io.serialize_tensor(image)<br>
+#image_data = tf.io.encode_jpeg(image[..., np.newaxis])<br>
+return Example(<br>
+features=Features(<br>
+feature={<br>
+&quot;image&quot;: Feature(bytes_list=BytesList(value=[image_data.numpy()])),<br>
+&quot;label&quot;: Feature(int64_list=Int64List(value=[label])),<br>
+}))</p>
+<p>for image, label in valid_set.take(1):<br>
+print(create_example(image, label))</p>
+<p>from contextlib import ExitStack</p>
+<h1 id=""></h1>
+<p>def write_tfrecords(name, dataset, n_shards=10):<br>
+paths = [&quot;{}.tfrecord-{:05d}-of-{:05d}&quot;.format(name, index, n_shards)<br>
+for index in range(n_shards)]<br>
+with ExitStack() as stack:<br>
+writers = [stack.enter_context(tf.io.TFRecordWriter(path))<br>
+for path in paths]<br>
+for index, (image, label) in dataset.enumerate():<br>
+shard = index % n_shards<br>
+example = create_example(image, label)<br>
+writers[shard].write(example.SerializeToString())<br>
+return paths</p>
+<p>train_filepaths = write_tfrecords(&quot;my_fashion_mnist.train&quot;, train_set)<br>
+valid_filepaths = write_tfrecords(&quot;my_fashion_mnist.valid&quot;, valid_set)<br>
+test_filepaths = write_tfrecords(&quot;my_fashion_mnist.test&quot;, test_set)</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[DSP_00002_TextVectorization]]></title>
         <id>https://fa7ria.GitHub.io/datascientist_practice_00002_textvectorization/</id>
