@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>DSP_00005_Stacking_house_price | Fa7riaBlog</title>
+<meta name="description" content="为学日益，为道日损。损之又损，以至于无为，无为而无不为">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://fa7ria.GitHub.io/favicon.ico?v=1621731942824">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://fa7ria.GitHub.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://fa7ria.GitHub.io">Fa7riaBlog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>DSP_00005_Stacking_house_price</h1>
+            <p class="article-meta">
+              2021-05-23
+              
+            </p>
+            
+            <div class="post-content">
+              <blockquote>
+<pre><code>Stacking 是什么?
+Stacking简单理解就是讲几个简单的模型，一般采用将它们进行K折交叉验证输出预测结果， 然后将每个模型输出的预测结果合并为新的特征，并使用新的模型加以训练。
+</code></pre>
+</blockquote>
+<pre><code class="language-python"># -*- coding: utf-8 -*-
+
+
+'''
+描述：DataScientist_Practice_00005
+    hands-on ml charpt13 practice
+    Stacking 是什么?
+作者：liuyi
+程序开发环境：win 64位
+Python版本：64位 3.8.3（使用Anaconda安装）
+python IDE：PyCharm 2020.1专业版
+依赖库：tensorflow,keras,IPython,numpy,os
+程序输入：具体查看各模块
+程序输出：具体查看各模块
+
+'''
+####################################################################
+
+
+
+
+
+# 加载数据集
+input_dir = 'C:/Users/ericf/PycharmProjects/data_scientenist/data/raw/'
+output_dir = 'C:/Users/ericf/PycharmProjects/data_scientenist/data/processed/'
+# Stacking 是什么?
+# Stacking简单理解就是讲几个简单的模型，一般采用将它们进行K折交叉验证输出预测结果，
+# 然后将每个模型输出的预测结果合并为新的特征，并使用新的模型加以训练。
+#
+# ###
+# 主要的过程简述如下：
+# 1、首先需要几个模型，然后对已有的数据集进行K折交叉验证
+# 2、K折交叉验证训练集，对每折的输出结果保存，最后进行合并
+# 3、对于测试集T1的得到，有两种方法。注意到刚刚是2折交叉验证，M1相当于训练了2次，
+#  所以一种方法是每一次训练M1，可以直接对整个test进行预测，这样2折交叉验证后测试集相当于预测了2次，然后对这两列求平均得到T1。
+# 4、是两层循环，第一层循环控制基模型的数目，第二层循环控制的是交叉验证的次数K，对每一个基模型会训练K次，然后拼接得到预测结果P1。
+# 5、该图是一个基模型得到P1和T1的过程，采用的是5折交叉验证，所以循环了5次，拼接得到P1，测试集预测了5次，取平均得到T1。
+#   而这仅仅只是第二层输入的一列/一个特征，并不是整个训练集。再分析作者的代码也就很清楚了。也就是刚刚提到的两层循环
+#import some necessary librairies
+
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+import seaborn as sns
+color = sns.color_palette()
+sns.set_style('darkgrid')
+import warnings
+def ignore_warn(*args, **kwargs):
+    pass
+# ignore annoying warning (from sklearn and seaborn)
+warnings.warn = ignore_warn
+from sklearn.preprocessing import LabelEncoder
+from scipy import stats
+from scipy.stats import norm, skew #for some statistics
+from sklearn.linear_model import ElasticNet, Lasso,  BayesianRidge, LassoLarsIC
+from sklearn.ensemble import RandomForestRegressor,  GradientBoostingRegressor
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import RobustScaler
+from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin, clone
+from sklearn.model_selection import KFold, cross_val_score, train_test_split
+from sklearn.metrics import mean_squared_error
+import xgboost as xgb
+import lightgbm as lgb
+
+# 设置输出的浮点数的格式
+pd.set_option('display.float_format', lambda x: '{:.3f}'.format(x))
+
+from subprocess import check_output
+# check the files available in the directory
+# print(check_output([&quot;ls&quot;, &quot;/Users/liudong/Desktop/house_price/train.csv&quot;]).decode(&quot;utf8&quot;))
+# 加载数据
+train_file = input_dir + 'house_prices/train.csv'
+test_file = input_dir + 'house_prices/test.csv'
+train = pd.read_csv(train_file)
+test = pd.read_csv(test_file)
+# 查看训练数据的特征
+print(train.head(5))
+# 查看测试数据的特征
+print(test.head(5))
+
+# 查看未删除ID之前数据的shape （1460， 81） （1459， 80）
+print(&quot;The train data size before dropping Id feature is : {} &quot;.format(train.shape))
+print(&quot;The test data size before dropping Id feature is : {} &quot;.format(test.shape))
+
+# 保存 Id列的值
+train_ID = train['Id']
+test_ID = test['Id']
+
+# 删除ID列的值，因为它对于预测结果没有太大的影响
+train.drop(&quot;Id&quot;, axis = 1, inplace = True)
+test.drop(&quot;Id&quot;, axis = 1, inplace = True)
+
+# 检查删除ID以后的数据的shape （1460， 80） （1459， 79）
+print(&quot;\nThe train data size after dropping Id feature is : {} &quot;.format(train.shape))
+print(&quot;The test data size after dropping Id feature is : {} &quot;.format(test.shape))
+
+# 删除那些异常数据值   异常值的处理对应于那些极端情况
+'''
+fig, ax = plt.subplots()
+ax.scatter(x = train['GrLivArea'], y = train['SalePrice'])
+plt.ylabel('SalePrice', fontsize=13)
+plt.xlabel('GrLivArea', fontsize=13)
+plt.show()
+这里举的是异常值的处理  Example：房子面积很大，但是价格很低 其他的这种异常并不是需要全部删除
+还要保持模型的健壮性
+'''
+train = train.drop(train[(train['GrLivArea']&gt;4000) &amp; (train['SalePrice']&lt;300000)].index)
+
+# 对SalePrice使用log(1+x)的形式来处理
+train[&quot;SalePrice&quot;] = np.log1p(train[&quot;SalePrice&quot;])
+
+
+# 特征工程
+# 将train数据集和test数据集结合在一起
+# ntrain ntest 各自行数
+ntrain = train.shape[0]
+ntest = test.shape[0]
+y_train = train.SalePrice.values
+# contact连接以后index只是重复，会出现逻辑错误  需要使用reset_index处理 drop为True
+all_data = pd.concat((train, test)).reset_index(drop=True)
+all_data.drop(['SalePrice'], axis=1, inplace=True)
+print(&quot;all_data size is : {}&quot;.format(all_data.shape))
+
+# 特征工程  对特征进行处理
+# 处理缺失数据
+print(all_data.isnull().sum())
+all_data_na = (all_data.isnull().sum() / len(all_data)) * 100
+all_data_na = all_data_na.drop(all_data_na[all_data_na == 0].index).sort_values(ascending=False)[:30]
+missing_data = pd.DataFrame({'Missing Ratio' :all_data_na})
+print(missing_data.head(20))
+
+all_data[&quot;PoolQC&quot;] = all_data[&quot;PoolQC&quot;].fillna(&quot;None&quot;)
+all_data[&quot;MiscFeature&quot;] = all_data[&quot;MiscFeature&quot;].fillna(&quot;None&quot;)
+all_data[&quot;Alley&quot;] = all_data[&quot;Alley&quot;].fillna(&quot;None&quot;)
+all_data[&quot;Fence&quot;] = all_data[&quot;Fence&quot;].fillna(&quot;None&quot;)
+all_data[&quot;FireplaceQu&quot;] = all_data[&quot;FireplaceQu&quot;].fillna(&quot;None&quot;)
+
+# Group by neighborhood and fill in missing value by the median LotFrontage of all the neighborhood
+all_data[&quot;LotFrontage&quot;] = all_data.groupby(&quot;Neighborhood&quot;)[&quot;LotFrontage&quot;].transform(
+    lambda x: x.fillna(x.median()))
+for col in ('GarageType', 'GarageFinish', 'GarageQual', 'GarageCond'):
+    all_data[col] = all_data[col].fillna('None')
+for col in ('GarageYrBlt', 'GarageArea', 'GarageCars'):
+    all_data[col] = all_data[col].fillna(0)
+for col in ('BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF','TotalBsmtSF', 'BsmtFullBath', 'BsmtHalfBath'):
+    all_data[col] = all_data[col].fillna(0)
+for col in ('BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2'):
+    all_data[col] = all_data[col].fillna('None')
+all_data[&quot;MasVnrType&quot;] = all_data[&quot;MasVnrType&quot;].fillna(&quot;None&quot;)
+all_data[&quot;MasVnrArea&quot;] = all_data[&quot;MasVnrArea&quot;].fillna(0)
+all_data['MSZoning'] = all_data['MSZoning'].fillna(all_data['MSZoning'].mode()[0])
+# all records are &quot;AllPub&quot;, except for one &quot;NoSeWa&quot; and 2 NA  remove
+all_data = all_data.drop(['Utilities'], axis=1)
+all_data[&quot;Functional&quot;] = all_data[&quot;Functional&quot;].fillna(&quot;Typ&quot;)
+all_data['Electrical'] = all_data['Electrical'].fillna(all_data['Electrical'].mode()[0])
+all_data['KitchenQual'] = all_data['KitchenQual'].fillna(all_data['KitchenQual'].mode()[0])
+all_data['Exterior1st'] = all_data['Exterior1st'].fillna(all_data['Exterior1st'].mode()[0])
+all_data['Exterior2nd'] = all_data['Exterior2nd'].fillna(all_data['Exterior2nd'].mode()[0])
+all_data['SaleType'] = all_data['SaleType'].fillna(all_data['SaleType'].mode()[0])
+all_data['MSSubClass'] = all_data['MSSubClass'].fillna(&quot;None&quot;)
+# 检查是否还有缺失值存在 输出结果是没有缺失值存在
+all_data_na = (all_data.isnull().sum() / len(all_data)) * 100
+all_data_na = all_data_na.drop(all_data_na[all_data_na == 0].index).sort_values(ascending=False)
+missing_data = pd.DataFrame({'Missing Ratio' :all_data_na})
+print(missing_data.head())
+# 附加的特征工程
+# 把一些数值变量分类
+#MSSubClass=建筑物的类别
+all_data['MSSubClass'] = all_data['MSSubClass'].apply(str)
+
+#Changing OverallCond into a categorical variable
+all_data['OverallCond'] = all_data['OverallCond'].astype(str)
+
+#Year and month sold are transformed into categorical features.
+all_data['YrSold'] = all_data['YrSold'].astype(str)
+all_data['MoSold'] = all_data['MoSold'].astype(str)
+
+# 这些类别型的数据需要转换为数值型的数据
+cols = ('FireplaceQu', 'BsmtQual', 'BsmtCond', 'GarageQual', 'GarageCond',
+        'ExterQual', 'ExterCond','HeatingQC', 'PoolQC', 'KitchenQual', 'BsmtFinType1',
+        'BsmtFinType2', 'Functional', 'Fence', 'BsmtExposure', 'GarageFinish', 'LandSlope',
+        'LotShape', 'PavedDrive', 'Street', 'Alley', 'CentralAir', 'MSSubClass', 'OverallCond',
+        'YrSold', 'MoSold')
+# 将这些有类别的特征值(例如英文表示的额) 使用LabelEncoder变成分类的数值数据
+for c in cols:
+    lbl = LabelEncoder()
+    lbl.fit(list(all_data[c].values))
+    all_data[c] = lbl.transform(list(all_data[c].values))
+
+
+# shape
+print('Shape all_data: {}'.format(all_data.shape))
+
+# 增加更多重要的特征
+# 计算出房子总的面积  包含上下两层的面积 基础的面积  一层面积 二层面积
+all_data['TotalSF'] = all_data['TotalBsmtSF'] + all_data['1stFlrSF'] + all_data['2ndFlrSF']
+
+# Skewed features 将内容为数值型的特征列找出来  skewed为偏斜度的设置
+numeric_feats = all_data.dtypes[all_data.dtypes != &quot;object&quot;].index
+# 检查所有数值特征的偏斜度
+skewed_feats = all_data[numeric_feats].apply(lambda x: skew(x.dropna())).sort_values(ascending=False) #降序排列
+print(&quot;\nSkew in numerical features: \n&quot;)
+skewness = pd.DataFrame({'Skew' :skewed_feats})
+print(skewness.head(10))
+
+# Box Cox Transformation of (highly) skewed features
+# We use the scipy function boxcox1p which computes the Box-Cox transformation of  1+x .
+# Note that setting  λ=0  is equivalent to log1p used above for the target variable.
+skewness = skewness[abs (skewness) &gt; 0.75]
+print (&quot;There are {} skewed numerical features to Box Cox transform&quot;.format (skewness.shape[0]))
+
+# 转换数据位正态分布，避免长尾分布现象的出现
+from scipy.special import boxcox1p
+
+skewed_features = skewness.index
+lam = 0.15
+for feat in skewed_features:
+    # all_data[feat] += 1
+    all_data[feat] = boxcox1p(all_data[feat], lam)
+# one-hot编码
+all_data = pd.get_dummies(all_data)
+print(all_data.shape)
+'''
+###########################
+对数据处理以后新的训练集和测试集
+###########################
+'''
+train = all_data[:ntrain]
+test = all_data[ntrain:]
+# train, test = train_test_split(all_data, train_size=0.8, random_state=2)
+
+#k-fold交叉验证 5折交叉验证
+n_folds = 5
+
+
+def rmsle_cv(model):
+    kf = KFold(n_folds, shuffle=True, random_state=42).get_n_splits(train.values)
+    rmse = np.sqrt(-cross_val_score(model, train.values, y_train, scoring=&quot;neg_mean_squared_error&quot;, cv=kf))
+    return(rmse)
+
+# 模型的选择和使用
+# LASSO Regression :
+lasso = make_pipeline(RobustScaler(), Lasso(alpha=0.0005, random_state=1))
+# Elastic Net Regression 弹性网回归
+ENet = make_pipeline(RobustScaler(), ElasticNet(alpha=0.0005, l1_ratio=.9, random_state=3))
+# Kernel Ridge Regression 岭回归 alpha超参数
+KRR = KernelRidge(alpha=0.6, kernel='polynomial', degree=2, coef0=2.5)
+# Gradient Boosting Regression 梯度增强回归
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10,
+                                   loss='huber', random_state =5)
+#  XGboost
+model_xgb = xgb.XGBRegressor(colsample_bytree=0.4603, gamma=0.0468,
+                             learning_rate=0.05, max_depth=3,
+                             min_child_weight=1.7817, n_estimators=2200,
+                             reg_alpha=0.4640, reg_lambda=0.8571,
+                             subsample=0.5213, silent=1,
+                             random_state =7, nthread = -1)
+# lightGBM
+model_lgb = lgb.LGBMRegressor(objective='regression',num_leaves=5,
+                              learning_rate=0.05, n_estimators=720,
+                              max_bin = 55, bagging_fraction = 0.8,
+                              bagging_freq = 5, feature_fraction = 0.2319,
+                              feature_fraction_seed=9, bagging_seed=9,
+                              min_data_in_leaf =6, min_sum_hessian_in_leaf = 11)
+# 基础模型的评价得分  mean计算均值   std() 计算的是标准偏差
+score = rmsle_cv(lasso)
+print(&quot;\nLasso score: {:.4f} ({:.4f})\n&quot;.format(score.mean(), score.std()))
+score = rmsle_cv(ENet)
+print(&quot;ElasticNet score: {:.4f} ({:.4f})\n&quot;.format(score.mean(), score.std()))
+score = rmsle_cv(KRR)
+print(&quot;Kernel Ridge score: {:.4f} ({:.4f})\n&quot;.format(score.mean(), score.std()))
+score = rmsle_cv(GBoost)
+print(&quot;Gradient Boosting score: {:.4f} ({:.4f})\n&quot;.format(score.mean(), score.std()))
+score = rmsle_cv(model_xgb)
+print(&quot;Xgboost score: {:.4f} ({:.4f})\n&quot;.format(score.mean(), score.std()))
+score = rmsle_cv(model_lgb)
+print(&quot;LGBM score: {:.4f} ({:.4f})\n&quot; .format(score.mean(), score.std()))
+
+
+# 基础模型的分类器的平均值
+class AveragingModels(BaseEstimator, RegressorMixin, TransformerMixin):
+    def __init__(self, models):
+        self.models = models
+    # 模型的fit()函数
+    def fit(self, X, y):
+        self.models_ = [clone(x) for x in self.models]
+        # Train cloned base models
+        for model in self.models_:
+            model.fit(X, y)
+        return self
+
+    # 模型的预测 k-fold为预测的次数，将多列的数据合并，并取平均值
+    def predict(self, X):
+        # column_stack可以将多个列组合   [0,1],[2,3] 组合为 [[0,2],[1,3]]
+        predictions = np.column_stack([model.predict (X) for model in self.models_])
+        return np.mean(predictions, axis=1)
+# 评价这四个模型的好坏
+averaged_models = AveragingModels(models=(ENet, GBoost, KRR, lasso))
+score = rmsle_cv(averaged_models)
+print (&quot; Averaged base models score: {:.4f} ({:.4f})\n&quot;.format (score.mean (), score.std()))
+
+
+# 增加Meta-model 最最精彩的部分***回归预测***
+class StackingAveragedModels (BaseEstimator, RegressorMixin, TransformerMixin):
+    def __init__(self, base_models, meta_model, n_folds=5):
+        self.base_models = base_models
+        self.meta_model = meta_model
+        self.n_folds = n_folds
+
+    # We again fit the data on clones of the original models
+    def fit(self, X, y):
+        self.base_models_ = [list () for x in self.base_models]
+        self.meta_model_ = clone(self.meta_model)
+        kfold = KFold(n_splits=self.n_folds, shuffle=True, random_state=156)
+
+        # 使用K-fold的方法来进行交叉验证，将每次验证的结果作为新的特征来进行处理
+        out_of_fold_predictions = np.zeros((X.shape[0], len(self.base_models)))
+        for i, model in enumerate(self.base_models):
+            for train_index, holdout_index in kfold.split(X, y):
+                instance = clone(model)
+                self.base_models_[i].append(instance)
+                instance.fit(X[train_index],  y[train_index])
+                y_pred = instance.predict(X[holdout_index])
+                out_of_fold_predictions[holdout_index, i] = y_pred
+
+        # 将交叉验证预测出的结果 和 训练集中的标签值进行训练
+        self.meta_model_.fit(out_of_fold_predictions, y)
+        return self
+
+    # 从得到的新的特征  采用新的模型进行预测  并输出结果
+    def predict(self, X):
+        #两层列表解析，第一层为了生成kflod对应的模型组list，3（nbase_model）*5(nkfold)
+        #第二层为三个basemodel的均值组成
+        meta_features = np.column_stack ([
+            np.column_stack([model.predict (X) for model in base_models]).mean (axis=1)
+            for base_models in self.base_models_])
+        return self.meta_model_.predict(meta_features)
+
+stacked_averaged_models = StackingAveragedModels(base_models=(ENet, GBoost, KRR), # meta_model=model_lgb)
+                                                 meta_model=lasso)
+score = rmsle_cv(stacked_averaged_models)
+print(&quot;Stacking Averaged models score: {:.4f} ({:.4f})&quot;.format(score.mean(), score.std()))
+# 均方根误差评价函数
+def rmsle(y, y_pred):
+    return np.sqrt(mean_squared_error(y, y_pred))
+
+# 最后的Training、Prediction 输出结果
+# StackedRegressor
+stacked_averaged_models.fit(train.values, y_train)
+stacked_train_pred = stacked_averaged_models.predict(train.values)
+stacked_pred = np.expm1(stacked_averaged_models.predict(test.values))
+print(rmsle(y_train, stacked_train_pred))
+
+# XGBoost
+model_xgb.fit(train, y_train)
+xgb_train_pred = model_xgb.predict(train)
+xgb_pred = np.expm1(model_xgb.predict(test))
+print(rmsle(y_train, xgb_train_pred))
+
+# lightGBM
+model_lgb.fit(train, y_train)
+lgb_train_pred = model_lgb.predict(train)
+lgb_pred = np.expm1(model_lgb.predict(test.values))
+print(rmsle(y_train, lgb_train_pred))
+
+'''
+RMSE on the entire Train data when averaging
+'''
+print('RMSLE score on train data:')
+print(rmsle(y_train,stacked_train_pred*0.70 + xgb_train_pred*0.15 + lgb_train_pred*0.15 ))
+# 模型融合的预测效果
+ensemble = stacked_pred*0.70 + xgb_pred*0.15 + lgb_pred*0.15
+# 保存结果
+result = pd.DataFrame()
+result['Id'] = test_ID
+result['SalePrice'] = ensemble
+# index=False 是用来除去行编号
+output_file_name = output_dir + 'house_price_stacking_rslt.csv'
+result.to_csv(output_file_name, index=False)
+print('##########结束训练##########')
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://fa7ria.GitHub.io/dsp_00003_tfrecords/">
+                <h3 class="post-title">
+                  DSP_00003_TFRecords
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://fa7ria.GitHub.io/images/avatar.png?v=1621731942824" class="no-responsive avatar">
+    <div class="text-muted">为学日益，为道日损。损之又损，以至于无为，无为而无不为</div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/dsp_00005_stacking_house_price/">DSP_00005_Stacking_house_price</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/dsp_00003_tfrecords/">DSP_00003_TFRecords</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00002_textvectorization/">DSP_00002_TextVectorization</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00001/">DSP_00001</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_-xue-_001/">DSK_999</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/about/">关于</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/hello-gridea/">Hello Gridea</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge success">
+          DataScientist_Practice
+        </a>
+      
+        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge secondary">
+          DataScientist_Knowledge
+        </a>
+      
+        <a href="https://fa7ria.GitHub.io/6J4KjEj3k/" class="badge secondary">
+          Gridea
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fa7ria.GitHub.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>
