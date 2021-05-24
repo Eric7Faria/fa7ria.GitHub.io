@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>DSP_00006_parameters_cv | Fa7riaBlog</title>
+<meta name="description" content="为学日益，为道日损。损之又损，以至于无为，无为而无不为">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://fa7ria.GitHub.io/favicon.ico?v=1621858341720">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://fa7ria.GitHub.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://fa7ria.GitHub.io">Fa7riaBlog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>DSP_00006_parameters_cv</h1>
+            <p class="article-meta">
+              2021-05-24
+              
+                <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge secondary">
+                  DataScientist_Practice
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <blockquote>
+<p>机器学习中四中常见的超参数调优</p>
+<p>1、传统手工调参</p>
+<p>2、网格搜索【GridSearchCV】</p>
+<p>3、随机搜索【RandomizedSearchCV】</p>
+<p>4、贝叶斯搜索【skopt.BayesSearchCV】</p>
+</blockquote>
+<h3 id="贝叶斯搜索">贝叶斯搜索</h3>
+<blockquote>
+<p><strong>贝叶斯优化</strong>用于机器学习调参由J. Snoek(2012)提出，主要思想是，给定优化的目标函数(广义的函数，只需指定输入和输出即可，无需知道内部结构以及数学性质)，通过不断地添加样本点来更新目标函数的后验分布(高斯过程**,直到后验分布基本贴合于真实分布。简单的说，就是**考虑了上一次参数的信息，从而更好的调整当前的参数。</p>
+<p>他与常规的网格搜索或者随机搜索的区别是：</p>
+<ul>
+<li>贝叶斯调参采用高斯过程，<strong>考虑之前的参数信息</strong>，不断地更新先验；网格搜索未考虑之前的参数信息</li>
+<li>贝叶斯调参<strong>迭代次数少，速度快</strong>；网格搜索速度慢,参数多时易导致维度爆炸</li>
+<li>贝叶斯调参针对非凸问题依然<strong>稳健</strong>；网格搜索针对非凸问题易得到局部最优</li>
+</ul>
+</blockquote>
+<p>贝叶斯优化属于一类优化算法，称为基于序列模型的优化(SMBO)算法。这些算法使用先前对损失<strong>f</strong>的观察结果，以确定下一个(最优)点来抽样<strong>f</strong>。</p>
+<p>该算法大致可以概括如下。</p>
+<ol>
+<li>使用先前评估的点<strong>X</strong>1*:n*，计算损失<strong>f</strong>的后验期望。</li>
+<li>在新的点<strong>X</strong>的抽样损失<strong>f</strong>，从而最大化<strong>f</strong>的期望的某些方法。该方法指定<strong>f</strong>域的哪些区域最适于抽样。</li>
+</ol>
+<p>重复这些步骤，直到满足某些收敛准则。</p>
+<pre><code class="language-python"># -*- coding: utf-8 -*-
+
+
+'''
+描述：DataScientist_Practice_00006
+    贝叶斯超参数调优，在实践中，想枚举多个预测模型类，和不同的搜索空间和每个类的计算数。
+一个在线性支持向量机，核支持向量机和决策树
+
+作者：liuyi
+程序开发环境：win 64位
+Python版本：64位 3.8.3（使用Anaconda安装）
+python IDE：PyCharm 2020.1专业版
+依赖库：tensorflow,keras,IPython,numpy,os,skopt
+程序输入：具体查看各模块
+程序输出：具体查看各模块
+
+'''
+####################################################################
+
+
+import numpy as np
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+
+
+#############################################################################
+
+# Minimal example
+
+# ===============
+
+#
+
+# A minimal example of optimizing hyperparameters of SVC (Support Vector machine Classifier) is given below.
+
+
+
+from skopt import BayesSearchCV
+from sklearn.datasets import load_digits
+from sklearn.svm import SVC,SVR
+from sklearn.model_selection import train_test_split
+
+
+# 基本状态查看
+def set_summary(df):
+    '''
+    查看数据集的记录数、维度数、前2条数据、描述性统计和数据类型
+    :param df: 数据框
+    :return: 无
+    '''
+    print ('Data Overview')
+    print ('Records: {0}\tDimension{1}'.format(df.shape[0], (df.shape[1] - 1)))  # 打印数据集X形状
+    print ('-' * 30)
+    print (df.head(2))  # 打印前2条数据
+    print ('-' * 30)
+    print ('Data DESC')
+    print (df.describe())  # 打印数据基本描述性信息
+    # print ('Data Dtypes')
+    # print (df.dtypes)  # 打印数据类型
+    print ('-' * 60)
+
+# 缺失值审查
+def na_summary(df):
+    '''
+    查看数据集的缺失数据列、行记录数
+    :param df: 数据框
+    :return: 无
+    '''
+    na_cols = df.isnull().any(axis=0)  # 查看每一列是否具有缺失值
+    print('{:*^60}'.format('NA Cols:'))
+    print(na_cols)  # 查看具有缺失值的列
+    print('Total number of NA lines is: {0}'.format(df.isnull().any(axis=1).sum()))  # 查看具有缺失值的行总记录数
+
+
+# 加载数据集
+# X, y = load_digits(n_class=10, return_X_y=True)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.75, test_size=.25, random_state=0)
+
+
+input_dir = 'C:/Users/ericf/PycharmProjects/data_scientenist/data/raw/'
+output_dir = 'C:/Users/ericf/PycharmProjects/data_scientenist/data/processed/'
+
+train_path_file = input_dir + 'sh_600535_2018_2021.xlsx'
+
+raw_data = pd.read_excel(train_path_file)
+set_summary(raw_data)
+na_summary(raw_data)
+X = raw_data.iloc[:,1:-1]
+y = raw_data['close']
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.75, test_size=.25, random_state=7)
+
+
+
+# log-uniform: understand as search over p = exp(x) by varying x
+opt = BayesSearchCV(
+    #SVC(),
+    SVR(),
+    {
+        'C': (1e-6, 1e+6, 'log-uniform'),
+        'gamma': (1e-6, 1e+1, 'log-uniform'),
+        'degree': (1, 3),  # integer valued parameter
+        'kernel': ['linear', 'poly', 'rbf'],  # categorical parameter
+    },
+    n_iter=32,
+    cv=3
+)
+
+opt.fit(X_train, y_train)
+#best parameter combination
+print(&quot;best parameter combination: %s&quot; % opt.best_params_)
+print(&quot;val. score: %s&quot; % opt.best_score_)
+print(&quot;test score: %s&quot; % opt.score(X_test, y_test))
+
+
+
+
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>确定的先验经验的情况下：在确定参数的最佳组合和计算时间之间探索平衡。</p>
+<p>如果超参数空间(超参数个数)非常大，则使用随机搜索找到超参数的潜在组合，然后在该局部使用网格搜索(超参数的潜在组合)选择最优特征。或者再确定范围后使用贝叶斯搜索。</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://fa7ria.GitHub.io/dsp_00005_stacking_house_price/">
+                <h3 class="post-title">
+                  DSP_00005_Stacking_house_price
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://fa7ria.GitHub.io/images/avatar.png?v=1621858341720" class="no-responsive avatar">
+    <div class="text-muted">为学日益，为道日损。损之又损，以至于无为，无为而无不为</div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00006_parameters_cv/">DSP_00006_parameters_cv</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/dsp_00005_stacking_house_price/">DSP_00005_Stacking_house_price</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/dsp_00003_tfrecords/">DSP_00003_TFRecords</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00002_textvectorization/">DSP_00002_TextVectorization</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00001/">DSP_00001</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_-xue-_001/">DSK_999</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/about/">关于</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/hello-gridea/">Hello Gridea</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge success">
+          DataScientist_Practice
+        </a>
+      
+        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge success">
+          DataScientist_Knowledge
+        </a>
+      
+        <a href="https://fa7ria.GitHub.io/6J4KjEj3k/" class="badge secondary">
+          Gridea
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fa7ria.GitHub.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>

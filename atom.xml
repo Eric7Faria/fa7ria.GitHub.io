@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fa7ria.GitHub.io</id>
     <title>Fa7riaBlog</title>
-    <updated>2021-05-23T01:05:46.572Z</updated>
+    <updated>2021-05-24T12:13:00.097Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fa7ria.GitHub.io"/>
     <link rel="self" href="https://fa7ria.GitHub.io/atom.xml"/>
@@ -10,6 +10,160 @@
     <logo>https://fa7ria.GitHub.io/images/avatar.png</logo>
     <icon>https://fa7ria.GitHub.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Fa7riaBlog</rights>
+    <entry>
+        <title type="html"><![CDATA[DSP_00006_parameters_cv]]></title>
+        <id>https://fa7ria.GitHub.io/datascientist_practice_00006_parameters_cv/</id>
+        <link href="https://fa7ria.GitHub.io/datascientist_practice_00006_parameters_cv/">
+        </link>
+        <updated>2021-05-24T12:10:47.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>机器学习中四中常见的超参数调优</p>
+<p>1、传统手工调参</p>
+<p>2、网格搜索【GridSearchCV】</p>
+<p>3、随机搜索【RandomizedSearchCV】</p>
+<p>4、贝叶斯搜索【skopt.BayesSearchCV】</p>
+</blockquote>
+<h3 id="贝叶斯搜索">贝叶斯搜索</h3>
+<blockquote>
+<p><strong>贝叶斯优化</strong>用于机器学习调参由J. Snoek(2012)提出，主要思想是，给定优化的目标函数(广义的函数，只需指定输入和输出即可，无需知道内部结构以及数学性质)，通过不断地添加样本点来更新目标函数的后验分布(高斯过程**,直到后验分布基本贴合于真实分布。简单的说，就是**考虑了上一次参数的信息，从而更好的调整当前的参数。</p>
+<p>他与常规的网格搜索或者随机搜索的区别是：</p>
+<ul>
+<li>贝叶斯调参采用高斯过程，<strong>考虑之前的参数信息</strong>，不断地更新先验；网格搜索未考虑之前的参数信息</li>
+<li>贝叶斯调参<strong>迭代次数少，速度快</strong>；网格搜索速度慢,参数多时易导致维度爆炸</li>
+<li>贝叶斯调参针对非凸问题依然<strong>稳健</strong>；网格搜索针对非凸问题易得到局部最优</li>
+</ul>
+</blockquote>
+<p>贝叶斯优化属于一类优化算法，称为基于序列模型的优化(SMBO)算法。这些算法使用先前对损失<strong>f</strong>的观察结果，以确定下一个(最优)点来抽样<strong>f</strong>。</p>
+<p>该算法大致可以概括如下。</p>
+<ol>
+<li>使用先前评估的点<strong>X</strong>1*:n*，计算损失<strong>f</strong>的后验期望。</li>
+<li>在新的点<strong>X</strong>的抽样损失<strong>f</strong>，从而最大化<strong>f</strong>的期望的某些方法。该方法指定<strong>f</strong>域的哪些区域最适于抽样。</li>
+</ol>
+<p>重复这些步骤，直到满足某些收敛准则。</p>
+<pre><code class="language-python"># -*- coding: utf-8 -*-
+
+
+'''
+描述：DataScientist_Practice_00006
+    贝叶斯超参数调优，在实践中，想枚举多个预测模型类，和不同的搜索空间和每个类的计算数。
+一个在线性支持向量机，核支持向量机和决策树
+
+作者：liuyi
+程序开发环境：win 64位
+Python版本：64位 3.8.3（使用Anaconda安装）
+python IDE：PyCharm 2020.1专业版
+依赖库：tensorflow,keras,IPython,numpy,os,skopt
+程序输入：具体查看各模块
+程序输出：具体查看各模块
+
+'''
+####################################################################
+
+
+import numpy as np
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+
+
+#############################################################################
+
+# Minimal example
+
+# ===============
+
+#
+
+# A minimal example of optimizing hyperparameters of SVC (Support Vector machine Classifier) is given below.
+
+
+
+from skopt import BayesSearchCV
+from sklearn.datasets import load_digits
+from sklearn.svm import SVC,SVR
+from sklearn.model_selection import train_test_split
+
+
+# 基本状态查看
+def set_summary(df):
+    '''
+    查看数据集的记录数、维度数、前2条数据、描述性统计和数据类型
+    :param df: 数据框
+    :return: 无
+    '''
+    print ('Data Overview')
+    print ('Records: {0}\tDimension{1}'.format(df.shape[0], (df.shape[1] - 1)))  # 打印数据集X形状
+    print ('-' * 30)
+    print (df.head(2))  # 打印前2条数据
+    print ('-' * 30)
+    print ('Data DESC')
+    print (df.describe())  # 打印数据基本描述性信息
+    # print ('Data Dtypes')
+    # print (df.dtypes)  # 打印数据类型
+    print ('-' * 60)
+
+# 缺失值审查
+def na_summary(df):
+    '''
+    查看数据集的缺失数据列、行记录数
+    :param df: 数据框
+    :return: 无
+    '''
+    na_cols = df.isnull().any(axis=0)  # 查看每一列是否具有缺失值
+    print('{:*^60}'.format('NA Cols:'))
+    print(na_cols)  # 查看具有缺失值的列
+    print('Total number of NA lines is: {0}'.format(df.isnull().any(axis=1).sum()))  # 查看具有缺失值的行总记录数
+
+
+# 加载数据集
+# X, y = load_digits(n_class=10, return_X_y=True)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.75, test_size=.25, random_state=0)
+
+
+input_dir = 'C:/Users/ericf/PycharmProjects/data_scientenist/data/raw/'
+output_dir = 'C:/Users/ericf/PycharmProjects/data_scientenist/data/processed/'
+
+train_path_file = input_dir + 'sh_600535_2018_2021.xlsx'
+
+raw_data = pd.read_excel(train_path_file)
+set_summary(raw_data)
+na_summary(raw_data)
+X = raw_data.iloc[:,1:-1]
+y = raw_data['close']
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.75, test_size=.25, random_state=7)
+
+
+
+# log-uniform: understand as search over p = exp(x) by varying x
+opt = BayesSearchCV(
+    #SVC(),
+    SVR(),
+    {
+        'C': (1e-6, 1e+6, 'log-uniform'),
+        'gamma': (1e-6, 1e+1, 'log-uniform'),
+        'degree': (1, 3),  # integer valued parameter
+        'kernel': ['linear', 'poly', 'rbf'],  # categorical parameter
+    },
+    n_iter=32,
+    cv=3
+)
+
+opt.fit(X_train, y_train)
+#best parameter combination
+print(&quot;best parameter combination: %s&quot; % opt.best_params_)
+print(&quot;val. score: %s&quot; % opt.best_score_)
+print(&quot;test score: %s&quot; % opt.score(X_test, y_test))
+
+
+
+
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>确定的先验经验的情况下：在确定参数的最佳组合和计算时间之间探索平衡。</p>
+<p>如果超参数空间(超参数个数)非常大，则使用随机搜索找到超参数的潜在组合，然后在该局部使用网格搜索(超参数的潜在组合)选择最优特征。或者再确定范围后使用贝叶斯搜索。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[DSP_00005_Stacking_house_price]]></title>
         <id>https://fa7ria.GitHub.io/dsp_00005_stacking_house_price/</id>
