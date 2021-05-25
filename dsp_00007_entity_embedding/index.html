@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>DSP_00007_entity_embedding | Fa7riaBlog</title>
+<meta name="description" content="为学日益，为道日损。损之又损，以至于无为，无为而无不为">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="shortcut icon" href="https://fa7ria.GitHub.io/favicon.ico?v=1621930590729">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://fa7ria.GitHub.io/styles/main.css">
+
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+  </head>
+  <body>
+  
+    <nav class="navbar border fixed split-nav">
+  <div class="nav-brand">
+    <h3><a href="https://fa7ria.GitHub.io">Fa7riaBlog</a></h3>
+  </div>
+  <div class="collapsible">
+    <input id="collapsible1" type="checkbox" name="collapsible1">
+    <button>
+      <label for="collapsible1">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+      </label>
+    </button>
+    <div class="collapsible-body">
+      <ul class="inline">
+        
+          <li>
+            
+              <a href="/" class="menu">
+                首页
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/archives" class="menu">
+                归档
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/tags" class="menu">
+                标签
+              </a>
+            
+          </li>
+        
+          <li>
+            
+              <a href="/post/about" class="menu">
+                关于
+              </a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div id="top" class="row site">
+      <div class="sm-12 md-8 col">
+        <div class="paper">
+          <article class="article">
+            <h1>DSP_00007_entity_embedding</h1>
+            <p class="article-meta">
+              2021-05-25
+              
+                <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge secondary">
+                  DataScientist_Practice
+                </a>
+              
+            </p>
+            
+            <div class="post-content">
+              <blockquote>
+<p>机器学习中处理分类变量的三种常见方法</p>
+<ol>
+<li>one-hot encoding\label encoding</li>
+<li>histgram 映射</li>
+<li>Entity Embeddings（实体嵌入）</li>
+</ol>
+</blockquote>
+<h2 id="histgram-映射">histgram 映射</h2>
+<p>比如我们根据人们的一些身体特征来预测这个人会不会得糖尿病,其中有一个类别特征为男或者女，这时候我们如何对这个特征进行映射处理呢。按照histgram 的处理方式，会按照预测的类别的占比来标注属性。我们可以男：60/(60+40) = 0.6；女：50/(50+50) = 0.5。作为各自的特征。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">性别\是否得病</th>
+<th style="text-align:center">有糖尿病</th>
+<th style="text-align:center">无糖尿病</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">男</td>
+<td style="text-align:center">60</td>
+<td style="text-align:center">40</td>
+</tr>
+<tr>
+<td style="text-align:center">女</td>
+<td style="text-align:center">50</td>
+<td style="text-align:center">50</td>
+</tr>
+</tbody>
+</table>
+<h3 id="entity-embeddings">Entity Embeddings</h3>
+<p>Embedding的起源和火爆都是在NLP中的，经典的word2vec都是在做word embedding这件事情，而真正首先在结构数据探索embedding的是在kaggle上的《Rossmann Store Sales》中的rank 3的解决方案:结构非常简单，就是embedding层后面接上了两个全连接层，代码用keras写的，构建模型的代码量也非常少，用的keras的sequence model。</p>
+<p>文章有几点分析比较值得关注的地方。</p>
+<p>1、店铺所在地的嵌入向量在用TSNE投影到两维空间后和地图位置有着极大的相似性。<br>
+2、使用嵌入后的向量可以提高其他算法（KNN、随机森林、gdbt）的准确性。<br>
+3、作者探索了embedding和度量空间之间的联系，试图从数学层面深入探讨embedding的作用。</p>
+<pre><code class="language-python">## 《Rossmann Store Sales》中的rank 3的解决方案 keras source code
+def build_embedding_network():
+    inputs = []
+    embeddings = []
+    for i in range(len(embed_cols)):
+        cate_input = Input(shape=(1,))
+        input_dim = len(col_vals_dict[embed_cols[i]])
+        if input_dim &gt; 1000:
+            output_dim = 50
+        else:
+            output_dim = (len(col_vals_dict[embed_cols[i]]) // 2) + 1
+ 
+        embedding = Embedding(input_dim, output_dim, input_length=1)(cate_input)
+        embedding = Reshape(target_shape=(output_dim,))(embedding)
+        inputs.append(cate_input)
+        embeddings.append(embedding)
+ 
+    input_numeric = Input(shape=(4,))
+    embedding_numeric = Dense(5)(input_numeric)
+    inputs.append(input_numeric)
+    embeddings.append(embedding_numeric)
+ 
+    x = Concatenate()(embeddings)
+    x = Dense(300, activation='relu')(x)
+    x = Dropout(.35)(x)
+    x = Dense(100, activation='relu')(x)
+    x = Dropout(.15)(x)
+    output = Dense(1, activation='sigmoid')(x)
+ 
+    model = Model(inputs, output)
+ 
+    model.compile(loss='binary_crossentropy', optimizer='rmsprop')
+ 
+    return model
+    
+    
+    
+</code></pre>
+<pre><code class="language-python"># -*- coding: utf-8 -*-
+
+
+'''
+描述：DataScientist_Practice_00007
+    实体嵌入的代码练习
+作者：liuyi
+程序开发环境：win 64位
+Python版本：64位 3.8.3（使用Anaconda安装）
+python IDE：PyCharm 2020.1专业版
+依赖库：tensorflow,keras,IPython,numpy,os,GraphViz
+程序输入：具体查看各模块
+程序输出：具体查看各模块
+
+'''
+####################################################################
+
+
+import numpy as np
+
+import tensorflow as tf
+import random as rn
+
+# random seeds for stochastic parts of neural network
+np.random.seed(10)
+
+
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense, Concatenate, Reshape, Dropout, Embedding
+
+input_dir = 'C:/Users/ericf/PycharmProjects/data_scientenist/data/raw/'
+output_dir = 'C:/Users/ericf/PycharmProjects/data_scientenist/data/processed/'
+
+# ===================================================================================================
+
+# 记录类别特征embedding后的维度字典。key为类别特征索引，value为embedding后的维度
+cate_embedding_dimension = {'0': 3, '1': 2}
+
+# 需要手工设置每个特征的转换封装
+def build_embedding_network():
+    # 以网络结构embeddding层在前，dense层在后。即训练集的X必须以分类特征在前，连续特征在后。
+    inputs = []
+    embeddings = []
+
+    input_cate_feature_1 = Input(shape=(1,))
+    embedding = Embedding(10, 3, input_length=1)(input_cate_feature_1)
+    # embedding后是10*1*3，为了后续计算方便，因此使用Reshape转为10*3
+    embedding = Reshape(target_shape=(3,))(embedding)
+    inputs.append(input_cate_feature_1)
+    embeddings.append(embedding)
+
+    input_cate_feature_2 = Input(shape=(1,))
+    embedding = Embedding(4, 2, input_length=1)(input_cate_feature_2)
+    embedding = Reshape(target_shape=(2,))(embedding)
+    inputs.append(input_cate_feature_2)
+    embeddings.append(embedding)
+
+    input_numeric = Input(shape=(1,))
+    embedding_numeric = Dense(16)(input_numeric)
+    inputs.append(input_numeric)
+    embeddings.append(embedding_numeric)
+
+    x = Concatenate()(embeddings)
+
+    x = Dense(10, activation='relu')(x)
+    x = Dropout(.15)(x)
+    output = Dense(1, activation='sigmoid')(x)
+
+    model = Model(inputs, output)
+
+    model.compile(loss='binary_crossentropy', optimizer='adam')
+    model.summary()
+
+    return model
+
+
+# ===================================================================================================
+# 程序入口
+# ===================================================================================================
+'''
+输入数据是32*3，32个样本，2个类别特征，1个连续特征。
+对类别特征做entity embedding，第一个类别特征的可能值是0到9之间（10个），第二个类别特征的可能值是0到3之间（4个）。
+对这2个特征做one-hot的话，应该为32*14，
+对第一个类别特征做embedding使其为3维，对第二个类别特征做embedding使其为2维。3维和2维的设定是根据实验效果和交叉验证设定。
+对连续特征不做处理。
+这样理想输出的结果就应该是32*6，其中，类别特征维度为5，连续特征维度为1。
+'''
+# ===================================================================================================
+# 构造训练数据
+# ===================================================================================================
+
+sample_num = 32  # 样本数为32
+cate_feature_num = 2  # 类别特征为2
+contious_feature_num = 1  # 连续特征为1
+
+# 保证了训练集的复现
+rng = np.random.RandomState(17)
+cate_feature_1 = rng.randint(10, size=(32, 1))
+cate_feature_2 = rng.randint(4, size=(32, 1))
+contious_feature = rng.rand(32, 1)
+X = []
+X.append(cate_feature_1)
+X.append(cate_feature_2)
+X.append(contious_feature)
+# 二分类
+Y = np.random.randint(2, size=(32, 1))
+# print('x:', X)
+
+# ===================================================================================================
+# 训练和预测
+# ===================================================================================================
+# train
+NN = build_embedding_network()
+NN.fit(X, Y, epochs=3, batch_size=4, verbose=0)
+# predict
+y_preds = NN.predict(X)[:, 0]
+
+# 画出模型，需要GraphViz包。
+# from tensorflow.keras.utils import plot_model
+# output_file = output_dir + 'embedding_nn.png'
+# plot_model(NN, to_file=output_file)
+
+# ===================================================================================================
+# 读embedding层的输出结果
+# ===================================================================================================
+
+model = NN  # 创建原始模型
+for i in range(cate_feature_num):
+    # 由NN.png图可知，如果把类别特征放前，连续特征放后，cate_feature_num+i就是所有embedding层
+    layer_name = NN.get_config()['layers'][cate_feature_num + i]['name']
+
+    intermediate_layer_model = Model(inputs=NN.input,
+                                     outputs=model.get_layer(layer_name).output)
+
+    # numpy.array
+    intermediate_output = intermediate_layer_model.predict(X)
+
+    # print('intermediate_output:',intermediate_output)
+
+    intermediate_output.resize([32, cate_embedding_dimension[str(i)]])
+
+    if i == 0:
+        X_embedding_trans = intermediate_output
+    else:
+        X_embedding_trans = np.hstack((X_embedding_trans, intermediate_output))  # 水平拼接
+
+# 取出原来的连续特征。这里的list我转numpy一直出问题，被迫这么写循环了。
+for i in range(contious_feature_num):
+    if i == 0:
+        X_contious = X[cate_feature_num + i]
+    else:
+        X_contious = np.hstack((X_contious, X[cate_feature_num + i]))
+
+# ===================================================================================================
+# 在类别特征做embedding后的基础上，拼接连续特征，形成最终矩阵，也就是其它学习器的输入
+# ===================================================================================================
+
+'''
+最终的结果：32*6.其中，类别特征维度为5（前5个），连续特征维度为1（最后1个）
+'''
+X_trans = np.hstack((X_embedding_trans, X_contious))
+print('X_trans:',X_trans)
+
+
+# ===================================================================================================
+# ===================================================================================================
+# solution 2:
+# ===================================================================================================
+# ===================================================================================================
+
+import numpy as np
+import tensorflow as tf
+import random as rn
+
+# random seeds for stochastic parts of neural network
+np.random.seed(7)
+
+
+from tensorflow.keras.models import Model,Sequential
+from tensorflow.keras.layers import Input, Dense, Concatenate, Reshape, Dropout, Embedding
+ 
+
+ 
+ 
+'''
+输入数据是32*2，32个样本，2个类别特征，且类别特征的可能值是0到9之间(10个)。
+对这2个特征做one-hot的话，应该为32*20，
+embedding就是使1个特征原本应该one-hot的10维变为3维(手动设定，也可以是其它)，因为有2个类别特征
+这样输出的结果就应该是32*6
+'''
+model = Sequential()
+model.add(Embedding(10, 3, input_length=2))
+ 
+# 构造输入数据
+input_array = np.random.randint(10, size=(32, 2))
+ 
+# 搭建模型
+model.compile('rmsprop', 'mse')
+ 
+# 得到输出数据 输出格式为32*2*3。我们最终想要的格式为32*6，其实就是把2*3按照行拉成6维，然后就是我们对类别特征进行
+# embedding后得到的结果了。
+output_array = model.predict(input_array)
+ 
+# 查看权重参数
+weight = model.get_weights()
+
+# ===================================================================================================
+# ===================================================================================================
+# solution 3:
+# ===================================================================================================
+# ===================================================================================================
+import tensorflow as tf 
+import pandas as pd
+import numpy as np
+from pandas import Series,DataFrame
+import warnings
+warnings.filterwarnings('ignore') 
+import os
+ 
+file_name_string=&quot;E:/my_create_resource/deeplearning/data/ml-latest-small/movies.csv&quot;
+filename_queue = tf.train.string_input_producer([file_name_string])
+reader = tf.TextLineReader()
+_,value = reader.read(filename_queue)
+&quot;&quot;&quot;
+value = [
+  &quot;1,ToyStory,Adventure|Animation|Children|Comedy|Fantasy&quot;,
+&quot;2,Toytory,Adventure|Animation|Children|Comedy|Fantasy&quot; 
+]
+&quot;&quot;&quot;
+### Warning：获得TAG_SET——因为官方数据readme里面说Children's（实际上是Children），浪费半个小时找格式错误
+TAG_SET = [&quot;Action&quot;,&quot;Adventure&quot;,&quot;Animation&quot;,&quot;Children&quot;,&quot;Comedy&quot;,&quot;Crime&quot;,&quot;Documentary&quot;,&quot;Drama&quot;,
+&quot;Fantasy&quot;,&quot;Film-Noir&quot;,&quot;Horror&quot;,&quot;Musical&quot;,&quot;Mystery&quot;,&quot;Romance&quot;,&quot;Sci-Fi&quot;,&quot;Thriller&quot;,&quot;War&quot;,&quot;Western&quot;]
+ 
+def sparse_from_csv(csv):
+    ids, col2,col3 = tf.decode_csv(csv, [[-1], [&quot;&quot;],[&quot;&quot;]]) 
+    #保证样本和标签一一对应 这里的batch_size是超参TODO
+    ids_batch, col2_batch,col3_batch = tf.train.batch([ids, col2,col3], name='movies',batch_size=1, capacity=200, num_threads=2)    
+    table = tf.contrib.lookup.index_table_from_tensor(
+      mapping=TAG_SET, default_value=-1) ## 这里构造了个查找表 ##
+    
+    split_tags = tf.string_split(col3_batch, &quot;|&quot;)
+    
+    return ids_batch,col2_batch,tf.SparseTensor(
+      indices=split_tags.indices,
+      values=table.lookup(split_tags.values), ## 这里给出了不同值通过表查到的index ##
+      dense_shape=split_tags.dense_shape)
+ 
+TAG_EMBEDDING_DIM = 3
+## 生成TAG_SET这十八个类别的embedding值，之后使用
+embedding_params = tf.Variable(tf.truncated_normal([len(TAG_SET), TAG_EMBEDDING_DIM]))
+ 
+ids,names,tags = sparse_from_csv(value)
+embedded_tags = tf.nn.embedding_lookup_sparse(embedding_params, sp_ids=tags, sp_weights=None)
+
+
+</code></pre>
+<h2 id="总结">总结</h2>
+<p>1、想通过自己的模型和自定义层级进行entity embedding就通过以上的代码操作，读取model.get_layer(layer_name).output；或者使用上面的solution2的方法创建Sequential()的model。</p>
+<p>2、单列的单值转换：如果是使用tensorflow的Esitmator来建模，可以直接使用<strong>tf.feature_column.embedding_column</strong>构建特征列**，**直接将数据给它，它就给我们embedding好了。</p>
+<p>​	单列的多值转换：就是一条数据会拥有该属性多个值，而非一个，那么需要调用函数tf.feature_column.embedding_lookup_sparse‘；参考代码中solution3</p>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00006_parameters_cv/">
+                <h3 class="post-title">
+                  DSP_00006_parameters_cv
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
+      </div>
+
+      <div class="sm-12 md-4 col sidebar">
+  <div class="paper info-container">
+    <img src="https://fa7ria.GitHub.io/images/avatar.png?v=1621930590729" class="no-responsive avatar">
+    <div class="text-muted">为学日益，为道日损。损之又损，以至于无为，无为而无不为</div>
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      最新文章
+    </div>
+    <div class="row">
+      <ul>
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/dsp_00007_entity_embedding/">DSP_00007_entity_embedding</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00006_parameters_cv/">DSP_00006_parameters_cv</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/dsp_00005_stacking_house_price/">DSP_00005_Stacking_house_price</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/dsp_00003_tfrecords/">DSP_00003_TFRecords</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00002_textvectorization/">DSP_00002_TextVectorization</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_practice_00001/">DSP_00001</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/datascientist_-xue-_001/">DSK_999</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/about/">关于</a>
+            </li>
+          
+        
+          
+            <li>
+              <a href="https://fa7ria.GitHub.io/hello-gridea/">Hello Gridea</a>
+            </li>
+          
+        
+      </ul>
+    </div>
+  </div>
+  <div class="paper">
+    <div class="sidebar-title">
+      标签列表
+    </div>
+    <div class="row">
+      
+        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge ">
+          DataScientist_Practice
+        </a>
+      
+        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge success">
+          DataScientist_Knowledge
+        </a>
+      
+        <a href="https://fa7ria.GitHub.io/6J4KjEj3k/" class="badge secondary">
+          Gridea
+        </a>
+      
+    </div>
+  </div>
+  <div class="paper">
+    Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fa7ria.GitHub.io/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+
+
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+</script>
+
+
+
+
+  </body>
+</html>
