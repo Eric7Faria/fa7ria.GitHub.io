@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fa7ria.GitHub.io</id>
     <title>Fa7riaBlog</title>
-    <updated>2021-05-25T08:17:50.262Z</updated>
+    <updated>2021-08-25T11:17:38.976Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fa7ria.GitHub.io"/>
     <link rel="self" href="https://fa7ria.GitHub.io/atom.xml"/>
@@ -10,6 +10,52 @@
     <logo>https://fa7ria.GitHub.io/images/avatar.png</logo>
     <icon>https://fa7ria.GitHub.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Fa7riaBlog</rights>
+    <entry>
+        <title type="html"><![CDATA[DSP_00008_Leetcode006]]></title>
+        <id>https://fa7ria.GitHub.io/dsp_00008_leetcode006/</id>
+        <link href="https://fa7ria.GitHub.io/dsp_00008_leetcode006/">
+        </link>
+        <updated>2021-08-25T10:54:31.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>将一个给定字符串 s 根据给定的行数 numRows ，以从上往下、从左到右进行 Z 字形排列。</p>
+<p>比如输入字符串为 &quot;PAYPALISHIRING&quot; 行数为 3 时，排列如下：</p>
+<pre><code>P   A   H   N
+A P L S I I G
+Y   I   R
+</code></pre>
+</blockquote>
+<p>关键词：行索引递增递减<br>
+base case：len(s) &lt;= 2 or numRows==1</p>
+<p>程序：<br>
+创建长度为numRows的空列表，每个元素依次储存z字形的每一行<br>
+可能性条件：s中的每个字母的行索引先按1递增，直到numRows时按1递减，减到0时再次按1递增，如此反复</p>
+<pre><code class="language-python">def convert(s, numRows):
+    if len(s) &lt;= 2 or numRows==1:
+        return s
+
+    res = ['' for _ in range(numRows)]
+
+    i = 0
+    direct = -1
+    for c in s:
+        res[i] = res[i] + c
+        if i == 0 or i == numRows - 1:
+            direct = -direct
+        i = i + direct
+    print(res)
+    return ''.join(res)
+
+s, numRows = &quot;PAYPALISHIRING&quot;, 3
+rslt = convert(s,numRows)
+print(rslt)
+
+s2, numRows2 = &quot;adsdccccs&quot;, 4
+rslt2 = convert(s2,numRows2)
+
+print(rslt2)
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[DSP_00007_entity_embedding]]></title>
         <id>https://fa7ria.GitHub.io/dsp_00007_entity_embedding/</id>
@@ -1396,38 +1442,6 @@ preprocess(X_example)
 传统GBDT以CART作为基分类器，xgboost还支持线性分类器，这个时候xgboost相当于带L1和L2正则化项的逻辑斯蒂回归（分类问题）或者线性回归（回归问题）。<br>
 传统GBDT在优化时只用到一阶导数信息，xgboost则对代价函数进行了二阶泰勒展开，同时用到了一阶和二阶导数。</p>
 <p>xgboost在代价函数里加入了正则项，用于控制模型的复杂度。正则项里包含了树的叶子节点个数、每个叶子节点上输出的score的L2模的平方和。从Bias-variance tradeoff角度来讲，正则项降低了模型的variance，使学习出来的模型更加简单，防止过拟合，这也是xgboost优于传统GBDT的一个特性。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Hello Gridea]]></title>
-        <id>https://fa7ria.GitHub.io/hello-gridea/</id>
-        <link href="https://fa7ria.GitHub.io/hello-gridea/">
-        </link>
-        <updated>2018-12-11T16:00:00.000Z</updated>
-        <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-<!-- more -->
-<p><a href="https://github.com/getgridea/gridea">Github</a><br>
-<a href="https://gridea.dev/">Gridea 主页</a><br>
-<a href="http://fehey.com/">示例网站</a></p>
-<h2 id="特性">特性👇</h2>
-<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
-<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
-<p>🏷️  你可以对文章进行标签分组</p>
-<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
-<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
-<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
-<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
-<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
-<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
-<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
-<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
-<p>未来，它一定会成为你离不开的伙伴</p>
-<p>尽情发挥你的才华吧！</p>
-<p>😘 Enjoy~</p>
 ]]></content>
     </entry>
 </feed>

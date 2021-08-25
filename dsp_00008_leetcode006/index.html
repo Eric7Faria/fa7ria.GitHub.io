@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Fa7riaBlog</title>
+<title>DSP_00008_Leetcode006 | Fa7riaBlog</title>
 <meta name="description" content="为学日益，为道日损。损之又损，以至于无为，无为而无不为">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -23,6 +23,7 @@
 
   </head>
   <body>
+  
     <nav class="navbar border fixed split-nav">
   <div class="nav-brand">
     <h3><a href="https://fa7ria.GitHub.io">Fa7riaBlog</a></h3>
@@ -76,209 +77,76 @@
   </div>
 </nav>
 
-
     <div id="top" class="row site">
       <div class="sm-12 md-8 col">
         <div class="paper">
+          <article class="article">
+            <h1>DSP_00008_Leetcode006</h1>
+            <p class="article-meta">
+              2021-08-25
+              
+            </p>
+            
+            <div class="post-content">
+              <blockquote>
+<p>将一个给定字符串 s 根据给定的行数 numRows ，以从上往下、从左到右进行 Z 字形排列。</p>
+<p>比如输入字符串为 &quot;PAYPALISHIRING&quot; 行数为 3 时，排列如下：</p>
+<pre><code>P   A   H   N
+A P L S I I G
+Y   I   R
+</code></pre>
+</blockquote>
+<p>关键词：行索引递增递减<br>
+base case：len(s) &lt;= 2 or numRows==1</p>
+<p>程序：<br>
+创建长度为numRows的空列表，每个元素依次储存z字形的每一行<br>
+可能性条件：s中的每个字母的行索引先按1递增，直到numRows时按1递减，减到0时再次按1递增，如此反复</p>
+<pre><code class="language-python">def convert(s, numRows):
+    if len(s) &lt;= 2 or numRows==1:
+        return s
+
+    res = ['' for _ in range(numRows)]
+
+    i = 0
+    direct = -1
+    for c in s:
+        res[i] = res[i] + c
+        if i == 0 or i == numRows - 1:
+            direct = -direct
+        i = i + direct
+    print(res)
+    return ''.join(res)
+
+s, numRows = &quot;PAYPALISHIRING&quot;, 3
+rslt = convert(s,numRows)
+print(rslt)
+
+s2, numRows2 = &quot;adsdccccs&quot;, 4
+rslt2 = convert(s2,numRows2)
+
+print(rslt2)
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+        <div class="paper" data-aos="fade-in">
           
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://fa7ria.GitHub.io/dsp_00008_leetcode006/">DSP_00008_Leetcode006</a>
-    </h2>
-    <p class="article-meta">
-      2021-08-25
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://fa7ria.GitHub.io/dsp_00008_leetcode006/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://fa7ria.GitHub.io/dsp_00007_entity_embedding/">DSP_00007_entity_embedding</a>
-    </h2>
-    <p class="article-meta">
-      2021-05-25
-      
-        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge ">
-          DataScientist_Practice
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://fa7ria.GitHub.io/dsp_00007_entity_embedding/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://fa7ria.GitHub.io/datascientist_practice_00006_parameters_cv/">DSP_00006_parameters_cv</a>
-    </h2>
-    <p class="article-meta">
-      2021-05-24
-      
-        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge success">
-          DataScientist_Practice
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://fa7ria.GitHub.io/datascientist_practice_00006_parameters_cv/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://fa7ria.GitHub.io/dsp_00005_stacking_house_price/">DSP_00005_Stacking_house_price</a>
-    </h2>
-    <p class="article-meta">
-      2021-05-23
-      
-        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge warning">
-          DataScientist_Practice
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://fa7ria.GitHub.io/dsp_00005_stacking_house_price/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://fa7ria.GitHub.io/dsp_00003_tfrecords/">DSP_00003_TFRecords</a>
-    </h2>
-    <p class="article-meta">
-      2021-05-11
-      
-        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge ">
-          DataScientist_Practice
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://fa7ria.GitHub.io/dsp_00003_tfrecords/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://fa7ria.GitHub.io/datascientist_practice_00002_textvectorization/">DSP_00002_TextVectorization</a>
-    </h2>
-    <p class="article-meta">
-      2021-05-09
-      
-        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge secondary">
-          DataScientist_Practice
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://fa7ria.GitHub.io/datascientist_practice_00002_textvectorization/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://fa7ria.GitHub.io/datascientist_practice_00001/">DSP_00001</a>
-    </h2>
-    <p class="article-meta">
-      2021-05-08
-      
-        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge ">
-          DataScientist_Practice
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://fa7ria.GitHub.io/datascientist_practice_00001/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://fa7ria.GitHub.io/datascientist_-xue-_001/">DSK_999</a>
-    </h2>
-    <p class="article-meta">
-      2021-05-07
-      
-        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge ">
-          DataScientist_Knowledge
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://fa7ria.GitHub.io/datascientist_-xue-_001/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
-
-
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://fa7ria.GitHub.io/dsp_00007_entity_embedding/">
+                <h3 class="post-title">
+                  DSP_00007_entity_embedding
+                </h3>
+              </a>
+            </div>
+          
         </div>
         
-        <div class="row flex-edges">
-  
-  
-</div>
-
       </div>
-      
+
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
     <img src="https://fa7ria.GitHub.io/images/avatar.png?v=1629890250863" class="no-responsive avatar">
@@ -365,7 +233,7 @@
           DataScientist_Practice
         </a>
       
-        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge warning">
+        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge success">
           DataScientist_Knowledge
         </a>
       
@@ -376,7 +244,9 @@
   </div>
 </div>
 
+
     </div>
+
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 
 <script type="application/javascript">
