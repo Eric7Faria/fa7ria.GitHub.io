@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>DataScientist_Knowledge | Fa7riaBlog</title>
+<title>DSP_00009_LeetCode005 | Fa7riaBlog</title>
 <meta name="description" content="为学日益，为道日损。损之又损，以至于无为，无为而无不为">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -23,6 +23,7 @@
 
   </head>
   <body>
+  
     <nav class="navbar border fixed split-nav">
   <div class="nav-brand">
     <h3><a href="https://fa7ria.GitHub.io">Fa7riaBlog</a></h3>
@@ -71,40 +72,86 @@
     <div id="top" class="row site">
       <div class="sm-12 md-8 col">
         <div class="paper">
-          <h2 class="current-tag">标签: DataScientist_Knowledge</h2>
-          
-  <article class="article">
-    <h2 class="article-title">
-      <a href="https://fa7ria.GitHub.io/datascientist_-xue-_001/">DSK_999</a>
-    </h2>
-    <p class="article-meta">
-      2021-05-07
-      
-        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge success">
-          DataScientist_Knowledge
-        </a>
-      
-    </p>
-    <p class="text-lead">
-      
-    </p>
-    <div class="row">
-      <a href="https://fa7ria.GitHub.io/datascientist_-xue-_001/" class="readmore-link">
-        <button>
-          Read More
-        </button>
-      </a>
-    </div>
-  </article>
+          <article class="article">
+            <h1>DSP_00009_LeetCode005</h1>
+            <p class="article-meta">
+              2021-08-26
+              
+            </p>
+            
+            <div class="post-content">
+              <p>给你一个字符串 <code>s</code>，找到 <code>s</code> 中最长的回文子串。</p>
+<blockquote>
+<pre><code class="language-python">输入：s = &quot;babad&quot;
+输出：&quot;bab&quot;
+解释：&quot;aba&quot; 同样是符合题意的答案。
+</code></pre>
+</blockquote>
+<p>（一）中心扩展法，最直观的方法,可读性最高的解法<br>
+（1）以每个位置为中心，向两边扩散。<br>
+分为palindrome_str长度为奇数和偶数2种情况<br>
+（2）传递下去的条件是s[L]==s[R]</p>
+<pre><code class="language-python">def longestPalindrome( s):
+    n = len(s)
+    if n &lt; 2:
+        return s
+
+    ##############中心扩展法，最直观的方法
+    def center_spread(L, R):
+        while 0 &lt;= L and R &lt; n and s[L] == s[R]:
+            L -= 1
+            R += 1
+        return s[L + 1: R]
+
+    res = s[0]
+    max_len = 1
+
+    for i in range(n):
+        odd_str = center_spread(i, i)
+        even_str = center_spread(i, i + 1)
+
+        if len(odd_str) &gt; len(even_str):  # 若长度为奇数的长
+            if len(odd_str) &gt; max_len:
+                max_len = len(odd_str)
+                res = odd_str
+        else:  # 若长度为偶数的长
+            if len(even_str) &gt; max_len:
+                max_len = len(even_str)
+                res = even_str
+
+    return res
 
 
+
+
+
+
+s = &quot;babad&quot;
+rslt = longestPalindrome(s)
+
+print(rslt)
+</code></pre>
+
+            </div>
+          </article>
         </div>
-        <div class="row flex-edges">
-  
-  
-</div>
-
+        <div class="paper" data-aos="fade-in">
+          
+            <div class="next-post">
+              <div class="next">
+                下一篇
+              </div>
+              <a href="https://fa7ria.GitHub.io/dsp_00008_leetcode006/">
+                <h3 class="post-title">
+                  DSP_00008_Leetcode006
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+        
       </div>
+
       <div class="sm-12 md-4 col sidebar">
   <div class="paper info-container">
     <img src="https://fa7ria.GitHub.io/images/avatar.png?v=1629986412947" class="no-responsive avatar">
@@ -193,11 +240,11 @@
     </div>
     <div class="row">
       
-        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge success">
+        <a href="https://fa7ria.GitHub.io/HwiRtp_iI/" class="badge warning">
           DataScientist_Practice
         </a>
       
-        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge warning">
+        <a href="https://fa7ria.GitHub.io/ZsI6TLsBB/" class="badge success">
           DataScientist_Knowledge
         </a>
       
@@ -207,6 +254,7 @@
     Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fa7ria.GitHub.io/atom.xml" target="_blank">RSS</a>
   </div>
 </div>
+
 
     </div>
 

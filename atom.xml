@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fa7ria.GitHub.io</id>
     <title>Fa7riaBlog</title>
-    <updated>2021-08-25T11:17:54.211Z</updated>
+    <updated>2021-08-26T14:34:09.725Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fa7ria.GitHub.io"/>
     <link rel="self" href="https://fa7ria.GitHub.io/atom.xml"/>
@@ -10,6 +10,65 @@
     <logo>https://fa7ria.GitHub.io/images/avatar.png</logo>
     <icon>https://fa7ria.GitHub.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Fa7riaBlog</rights>
+    <entry>
+        <title type="html"><![CDATA[DSP_00009_LeetCode005]]></title>
+        <id>https://fa7ria.GitHub.io/dsp_00009_leetcode006/</id>
+        <link href="https://fa7ria.GitHub.io/dsp_00009_leetcode006/">
+        </link>
+        <updated>2021-08-26T13:59:06.000Z</updated>
+        <content type="html"><![CDATA[<p>给你一个字符串 <code>s</code>，找到 <code>s</code> 中最长的回文子串。</p>
+<blockquote>
+<pre><code class="language-python">输入：s = &quot;babad&quot;
+输出：&quot;bab&quot;
+解释：&quot;aba&quot; 同样是符合题意的答案。
+</code></pre>
+</blockquote>
+<p>（一）中心扩展法，最直观的方法,可读性最高的解法<br>
+（1）以每个位置为中心，向两边扩散。<br>
+分为palindrome_str长度为奇数和偶数2种情况<br>
+（2）传递下去的条件是s[L]==s[R]</p>
+<pre><code class="language-python">def longestPalindrome( s):
+    n = len(s)
+    if n &lt; 2:
+        return s
+
+    ##############中心扩展法，最直观的方法
+    def center_spread(L, R):
+        while 0 &lt;= L and R &lt; n and s[L] == s[R]:
+            L -= 1
+            R += 1
+        return s[L + 1: R]
+
+    res = s[0]
+    max_len = 1
+
+    for i in range(n):
+        odd_str = center_spread(i, i)
+        even_str = center_spread(i, i + 1)
+
+        if len(odd_str) &gt; len(even_str):  # 若长度为奇数的长
+            if len(odd_str) &gt; max_len:
+                max_len = len(odd_str)
+                res = odd_str
+        else:  # 若长度为偶数的长
+            if len(even_str) &gt; max_len:
+                max_len = len(even_str)
+                res = even_str
+
+    return res
+
+
+
+
+
+
+s = &quot;babad&quot;
+rslt = longestPalindrome(s)
+
+print(rslt)
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[DSP_00008_Leetcode006]]></title>
         <id>https://fa7ria.GitHub.io/dsp_00008_leetcode006/</id>
