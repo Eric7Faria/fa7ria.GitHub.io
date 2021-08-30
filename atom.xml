@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fa7ria.GitHub.io</id>
     <title>Fa7riaBlog</title>
-    <updated>2021-08-26T14:34:09.725Z</updated>
+    <updated>2021-08-30T03:42:54.193Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fa7ria.GitHub.io"/>
     <link rel="self" href="https://fa7ria.GitHub.io/atom.xml"/>
@@ -66,6 +66,65 @@ s = &quot;babad&quot;
 rslt = longestPalindrome(s)
 
 print(rslt)
+</code></pre>
+<p>（二）manacher马拉车算法<br>
+（1）<br>
+arm_len数组。<br>
+与kmp有异曲同工之妙kmp需要预计算，求一个next数组<br>
+manacher和kmp的辅助数组，保存的本质都是各个位置的长度！！</p>
+<p>预处理：每个字母的左右侧都插入了‘#’----只考虑回文串长度为奇数就ok了</p>
+<p>（2）<br>
+if：maxR - i &gt;= 0<br>
+#i在maxR内部的时候，分为完全在内部(&gt;0)或者压界(=0),在压界的情况需要扩展调试</p>
+<p>else:<br>
+#i在maxR外部的时候，只能暴力扩展</p>
+<p>（3）每次更新<br>
+center:中心对称点<br>
+maxR：当前可达的最右端</p>
+<p>（4）每次更新<br>
+最长回文串在t串中的起点res_start和尾点res_end</p>
+<p>(5)<br>
+返回结果时，注意剔掉‘#’</p>
+<pre><code class="language-python">def longestPalindrome(self, s: str) -&gt; str:
+    t = '#' + ('#'.join(list(s))) + '#'
+    n = len(t)
+
+    arm_len = []        ##臂长数组 kmp算法的next数组也是存的长度 
+    res_start, res_end = 0, 0   ##最长回文串，在t串中的起点和尾点
+    maxR = -1           #当前可达的最右端
+    center = -1         #当前的中心
+    for i in range(n):  ####遍历每个位置，从左至右
+        cur_arm_len = 0     #最前的臂长
+        if maxR - i &gt;= 0:       #i在maxR内部的时候，分为完全在内部(&gt;0)或者压界(=0),在压界的情况需要扩展调试
+            mirror_i = 2 * center - i   #i关于center左侧的镜像点
+            cur_min_len = min(arm_len[mirror_i], maxR - i)
+            ###### 还要 中心扩散 尝试一下
+            cur_arm_len = self.center_spread(t, i - cur_min_len, i + cur_min_len)
+        else:               #i在maxR外部的时候，只能暴力扩展
+            cur_arm_len = self.center_spread(t, i, i)
+        ####### 存入arm_len数组
+        arm_len.append(cur_arm_len)
+        ####### 更新maxR，当前可以到达的最右端,更新center
+        if i + cur_arm_len &gt; maxR:
+            maxR = i + cur_arm_len
+            center = i
+        ####### 更新结果，最长回文串，在t中的起点和尾点的index
+        if (2 * cur_arm_len + 1) &gt; (res_end - res_start):
+            res_start = i - cur_arm_len
+            res_end = i + cur_arm_len
+
+    res = &quot;&quot;
+    for i in range(res_start, res_end + 1):
+        if t[i] != '#':
+            res += t[i]
+    return res
+####### 在t串中 中心扩散 ，返回在s串中的回文串长度
+def center_spread(self, t: str, L: int, R: int) -&gt; int:
+    n = len(t)
+    while 0&lt;=L and R&lt;n and t[L]==t[R]:
+        L -= 1
+        R += 1
+    return (R-L-2) // 2
 </code></pre>
 ]]></content>
     </entry>
